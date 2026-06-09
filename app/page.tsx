@@ -13,13 +13,24 @@ const highlights = [
 ];
 
 export default async function HomePage() {
-  const supabase = await createSupabaseServerClient();
-  const { data: recentNotices } = await supabase
-    .from("notices")
-    .select("id, title, type, summary, created_at, deadline, ref_no")
-    .eq("published", true)
-    .order("created_at", { ascending: false })
-    .limit(6);
+  let recentNotices: Array<{id: string; title: string; type: string; summary: string; created_at: string; deadline: string; ref_no: string}> = [];
+  
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data } = await supabase
+      .from("notices")
+      .select("id, title, type, summary, created_at, deadline, ref_no")
+      .eq("published", true)
+      .order("created_at", { ascending: false })
+      .limit(6);
+    
+    if (data) {
+      recentNotices = data;
+    }
+  } catch (error) {
+    console.error("Error fetching notices:", error);
+    // Continue rendering page with empty notices
+  }
 
   return (
     <>
