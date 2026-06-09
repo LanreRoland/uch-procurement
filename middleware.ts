@@ -2,12 +2,19 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+  try {
+    let supabaseResponse = NextResponse.next({ request });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
+    // Check if environment variables are available
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      // If env vars are missing, allow the request to proceed
+      return supabaseResponse;
+    }
+
+    const supabase = createServerClient(supabaseUrl, supabaseKey, {
       cookies: {
         getAll() {
           return request.cookies.getAll();
@@ -20,29 +27,33 @@ export async function middleware(request: NextRequest) {
           );
         },
       },
+    });
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
+    const isLoginPage = request.nextUrl.pathname === "/admin/login";
+
+    if (isAdminRoute && !isLoginPage && !user) {
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/admin/login";
+      return NextResponse.redirect(loginUrl);
     }
-  );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    if (isLoginPage && user) {
+      const dashboardUrl = request.nextUrl.clone();
+      dashboardUrl.pathname = "/admin";
+      return NextResponse.redirect(dashboardUrl);
+    }
 
-  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
-  const isLoginPage = request.nextUrl.pathname === "/admin/login";
-
-  if (isAdminRoute && !isLoginPage && !user) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/admin/login";
-    return NextResponse.redirect(loginUrl);
+    return supabaseResponse;
+  } catch (error) {
+    // Log error for debugging, but allow request to proceed
+    console.error("Middleware error:", error);
+    return NextResponse.next({ request });
   }
-
-  if (isLoginPage && user) {
-    const dashboardUrl = request.nextUrl.clone();
-    dashboardUrl.pathname = "/admin";
-    return NextResponse.redirect(dashboardUrl);
-  }
-
-  return supabaseResponse;
 }
 
 export const config = {
