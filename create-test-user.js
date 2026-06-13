@@ -45,7 +45,7 @@ async function main() {
   console.log('🚀 UCH Procurement - Create Test User');
   console.log('='.repeat(50));
   
-  await signUpUser('officer@uch.edu.ng', 'TestPassword123!');
+  await signUpUser('officer@uch-ibadan.org.ng', 'TestPassword123!');
   
   console.log('\n' + '='.repeat(50));
   console.log('✅ Done!');

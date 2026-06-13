@@ -59,6 +59,9 @@ export default async function HomePage() {
             <Link href="/about" className="btn-secondary border-white/40 text-white hover:bg-white/10 hover:text-white">
               About Procurement
             </Link>
+            <Link href="/admin/login" className="btn-secondary border-white/40 text-white hover:bg-white/10 hover:text-white">
+              Admin Login
+            </Link>
           </div>
         </div>
       </section>
