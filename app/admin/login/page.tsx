@@ -36,11 +36,11 @@ export default function AdminLoginPage() {
           {/* Top brand bar */}
           <div className="bg-uch-green px-8 pt-8 pb-6 flex flex-col items-center">
             <Image
-              src="/uch-procurement-logo.svg"
+              src="/logo.jpg"
               alt="UCH Procurement"
-              width={220}
-              height={60}
-              className="h-14 w-auto brightness-0 invert"
+              width={200}
+              height={200}
+              className="h-16 w-auto"
             />
             <p className="text-white/70 text-xs mt-3 uppercase tracking-widest">
               Staff Portal

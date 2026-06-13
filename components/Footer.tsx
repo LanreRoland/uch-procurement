@@ -11,11 +11,11 @@ export default function Footer() {
           {/* Branding */}
           <div>
             <Image
-              src="/uch-procurement-logo.svg"
+              src="/logo.jpg"
               alt="UCH Procurement"
               width={200}
-              height={54}
-              className="h-12 w-auto mb-4 brightness-0 invert"
+              height={200}
+              className="h-14 w-auto mb-4"
             />
             <p className="text-sm text-white/75 leading-relaxed">
               The official Procurement portal of University College Hospital
