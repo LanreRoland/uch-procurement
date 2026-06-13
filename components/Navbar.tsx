@@ -33,12 +33,12 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 shrink-0">
             <Image
-              src="/uch-procurement-logo.svg"
+              src="/logo.jpg"
               alt="UCH Procurement"
               width={200}
-              height={54}
+              height={200}
               priority
-              className="h-11 w-auto"
+              className="h-14 w-auto"
             />
           </Link>
 
