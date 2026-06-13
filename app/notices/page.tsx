@@ -22,18 +22,32 @@ export default async function NoticesPage({
   const params = await searchParams;
   const typeFilter = params.type as NoticeType | undefined;
 
-  const supabase = await createSupabaseServerClient();
-  let query = supabase
-    .from("notices")
-    .select("id, title, type, summary, created_at, deadline, ref_no")
-    .eq("published", true)
-    .order("created_at", { ascending: false });
+  let notices = null;
+  let error = null;
 
-  if (typeFilter && Object.keys(typeLabels).includes(typeFilter)) {
-    query = query.eq("type", typeFilter);
+  try {
+    const supabase = await createSupabaseServerClient();
+    let query = supabase
+      .from("notices")
+      .select("id, title, type, summary, created_at, deadline, ref_no")
+      .eq("published", true)
+      .order("created_at", { ascending: false });
+
+    if (typeFilter && Object.keys(typeLabels).includes(typeFilter)) {
+      query = query.eq("type", typeFilter);
+    }
+
+    const { data, error: supabaseError } = await query.limit(50);
+    if (supabaseError) {
+      console.error("Supabase query error:", supabaseError);
+      error = supabaseError.message;
+    } else {
+      notices = data;
+    }
+  } catch (err) {
+    console.error("Error fetching notices:", err);
+    error = err instanceof Error ? err.message : "Unknown error";
   }
-
-  const { data: notices } = await query.limit(50);
 
   const activeLabel = typeFilter ? typeLabels[typeFilter] : "All Notices";
 
@@ -79,7 +93,12 @@ export default async function NoticesPage({
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {notices && notices.length > 0 ? (
+        {error ? (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-red-800">
+            <p className="font-semibold">Error loading notices</p>
+            <p className="text-sm mt-1">{error}</p>
+          </div>
+        ) : notices && notices.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {notices.map((n) => (
               <NoticeCard key={n.id} notice={n as Parameters<typeof NoticeCard>[0]["notice"]} />
