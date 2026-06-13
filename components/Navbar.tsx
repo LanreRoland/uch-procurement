@@ -43,7 +43,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1 flex-1">
             {navLinks.map((link) =>
               link.children ? (
                 <div key={link.label} className="relative group">
@@ -88,6 +88,15 @@ export default function Navbar() {
             )}
           </nav>
 
+          {/* Admin Login Button */}
+          <Link
+            href="/admin/login"
+            className="hidden md:inline-block px-4 py-2 bg-white text-uch-green font-semibold rounded-md
+                       hover:bg-gray-100 transition-colors text-sm"
+          >
+            Admin Login
+          </Link>
+
           {/* Mobile toggle */}
           <button
             className="md:hidden text-white p-2"
@@ -131,6 +140,16 @@ export default function Navbar() {
                 </Link>
               )
             )}
+            <div className="border-t border-white/10 my-2 pt-2">
+              <Link
+                href="/admin/login"
+                onClick={() => setOpen(false)}
+                className="block px-4 py-3 bg-white text-uch-green font-semibold rounded-md
+                           hover:bg-gray-100 transition-colors text-sm text-center"
+              >
+                Admin Login
+              </Link>
+            </div>
           </div>
         </div>
       )}
