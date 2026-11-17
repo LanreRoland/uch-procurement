@@ -1,13 +1,10 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 import NoticeForm from "@/components/NoticeForm";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { requireAdmin } from "@/lib/cms/auth";
 
 export default async function NewNoticePage() {
-  const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/admin/login");
+  await requireAdmin();
 
   return (
     <div className="min-h-screen bg-gray-50">

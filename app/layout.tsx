@@ -6,12 +6,19 @@ export const metadata: Metadata = {
   description:
     "Official Procurement portal of University College Hospital (UCH), Ibadan. Tenders, contract awards, and procurement notices.",
   keywords: ["UCH", "procurement", "tender", "University College Hospital", "Ibadan", "Nigeria"],
+  icons: {
+    icon: "/uch-procurement-logo.svg",
+    shortcut: "/uch-procurement-logo.svg",
+    apple: "/logo.jpg",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        {children}
+      </body>
     </html>
   );
 }

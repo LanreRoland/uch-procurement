@@ -1,70 +1,51 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/cms/auth";
+import { hasDatabaseConfig } from "@/lib/cms/db";
 
 export default async function DiagnosticsPage() {
-  let diagnostics = {
-    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Set" : "❌ Missing",
-    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✅ Set" : "❌ Missing",
-    connectionStatus: "Checking...",
-    testQuery: "Checking...",
-  };
+  await requireAdmin();
 
-  try {
-    const supabase = await createSupabaseServerClient();
-    
-    // Test basic connection by querying notices
-    const { data, error } = await supabase
-      .from("notices")
-      .select("count")
-      .limit(1);
-
-    if (error) {
-      diagnostics.connectionStatus = `❌ Error: ${error.message}`;
-      diagnostics.testQuery = `❌ Query failed: ${error.code}`;
-    } else {
-      diagnostics.connectionStatus = "✅ Connected to Supabase";
-      diagnostics.testQuery = `✅ Database query successful`;
-    }
-  } catch (err) {
-    diagnostics.connectionStatus = `❌ Error: ${err instanceof Error ? err.message : "Unknown error"}`;
-    diagnostics.testQuery = "❌ Failed to test connection";
-  }
+  const hasDatabaseUrl = hasDatabaseConfig();
+  const hasAdminUsername = Boolean(process.env.ADMIN_USERNAME);
+  const hasAdminPassword = Boolean(process.env.ADMIN_PASSWORD);
+  const hasSessionSecret = Boolean(process.env.ADMIN_SESSION_SECRET);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">System Diagnostics</h1>
-        
-        <div className="bg-white rounded-lg shadow p-6 space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-800">Environment Variables</h2>
-            <ul className="mt-4 space-y-2 text-sm font-mono">
-              <li>NEXT_PUBLIC_SUPABASE_URL: <span className="font-bold">{diagnostics.supabaseUrl}</span></li>
-              <li>NEXT_PUBLIC_SUPABASE_ANON_KEY: <span className="font-bold">{diagnostics.supabaseKey}</span></li>
-            </ul>
+    <main className="min-h-screen bg-gray-50 px-4 py-10">
+      <div className="max-w-3xl mx-auto bg-white border border-gray-200 rounded-lg p-8">
+        <h1 className="font-display text-2xl font-bold text-gray-900 mb-2">
+          CMS Diagnostics
+        </h1>
+        <p className="text-sm text-gray-500 mb-8">
+          Configuration status for the UCH Procurement admin backend.
+        </p>
+
+        <div className="space-y-3 text-sm">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+            <span className="text-gray-600">PostgreSQL connection</span>
+            <span className={hasDatabaseUrl ? "text-green-700 font-semibold" : "text-red-700 font-semibold"}>
+              {hasDatabaseUrl ? "Configured" : "Missing DATABASE_URL"}
+            </span>
           </div>
-
-          <hr className="my-4" />
-
-          <div>
-            <h2 className="text-lg font-semibold text-gray-800">Supabase Connection</h2>
-            <ul className="mt-4 space-y-2 text-sm font-mono">
-              <li>Connection Status: <span className="font-bold">{diagnostics.connectionStatus}</span></li>
-              <li>Test Query: <span className="font-bold">{diagnostics.testQuery}</span></li>
-            </ul>
+          <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+            <span className="text-gray-600">Admin username env</span>
+            <span className={hasAdminUsername ? "text-green-700 font-semibold" : "text-yellow-700 font-semibold"}>
+              {hasAdminUsername ? "Configured" : "Using default"}
+            </span>
           </div>
-
-          <hr className="my-4" />
-
-          <div className="text-sm text-gray-600">
-            <p><strong>Next Steps:</strong></p>
-            <ol className="mt-2 list-decimal list-inside space-y-1">
-              <li>If env vars are missing: Add them to Vercel project settings</li>
-              <li>If connection fails: Check Supabase project is active</li>
-              <li>If query fails: Verify the "notices" table exists and RLS is configured</li>
-            </ol>
+          <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+            <span className="text-gray-600">Admin password env</span>
+            <span className={hasAdminPassword ? "text-green-700 font-semibold" : "text-yellow-700 font-semibold"}>
+              {hasAdminPassword ? "Configured" : "Using default"}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-gray-600">Session secret env</span>
+            <span className={hasSessionSecret ? "text-green-700 font-semibold" : "text-yellow-700 font-semibold"}>
+              {hasSessionSecret ? "Configured" : "Using default"}
+            </span>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

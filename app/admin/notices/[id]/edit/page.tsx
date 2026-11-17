@@ -1,16 +1,15 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import NoticeForm from "@/components/NoticeForm";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { requireAdmin } from "@/lib/cms/auth";
+import { getAdminNotice } from "@/lib/cms/notices";
 
 export default async function EditNoticePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/admin/login");
+  await requireAdmin();
 
-  const { data: notice } = await supabase.from("notices").select("*").eq("id", id).single();
+  const notice = await getAdminNotice(id);
   if (!notice) notFound();
 
   return (

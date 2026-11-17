@@ -43,7 +43,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1 flex-1">
+          <nav className="hidden md:flex items-center justify-end gap-1 ml-auto mr-4">
             {navLinks.map((link) =>
               link.children ? (
                 <div key={link.label} className="relative group">

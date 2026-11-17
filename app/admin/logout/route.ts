@@ -1,8 +1,9 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { clearAdminSession } from "@/lib/cms/auth";
 import { NextResponse } from "next/server";
 
 export async function POST() {
-  const supabase = await createSupabaseServerClient();
-  await supabase.auth.signOut();
-  return NextResponse.redirect(new URL("/admin/login", process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"));
+  await clearAdminSession();
+  return NextResponse.redirect(
+    new URL("/admin/login", process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000")
+  );
 }
